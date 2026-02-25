@@ -13,7 +13,7 @@ export const getForecastData = async (city) => {
   if (!response.ok) throw new Error('Forecast not found');
   const data = await response.json();
   
-  // Filter data to get one forecast per day (around noon)
+  //Filter data to get one forecast per day (around noon)
   const dailyData = data.list.filter((reading) => reading.dt_txt.includes("12:00:00"));
   return dailyData;
 };
