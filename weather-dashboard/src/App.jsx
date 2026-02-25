@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getWeatherData, getForecastData } from './services/weatherService';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getWeatherData, getForecastData } from './services/services/weatherService';
 
-// Reusable Detail Card with readable contrast
 const WeatherDetailCard = ({ title, value, icon }) => (
-  <div className="bg-white/20 backdrop-blur-2xl p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center border border-white/30 transition-transform active:scale-95">
-    <p className="text-white/70 text-[10px] uppercase tracking-widest mb-1 font-bold">{title}</p>
-    <div className="text-xl mb-1 drop-shadow-md">{icon}</div>
-    <p className="font-bold text-base text-white drop-shadow-sm">{value}</p>
+  <div className="bg-white/10 backdrop-blur-2xl p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center border border-white/20 transition-all active:scale-95 hover:bg-white/20">
+    <p className="text-white/60 text-[10px] uppercase tracking-tighter mb-1 font-bold">{title}</p>
+    <div className="text-2xl mb-1">{icon}</div>
+    <p className="font-bold text-base text-white">{value}</p>
   </div>
 );
 
@@ -15,7 +15,6 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState([]);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   
   const [recentSearches, setRecentSearches] = useState(() => {
@@ -24,17 +23,16 @@ function App() {
   });
 
   const getBgColor = () => {
-    if (!weather) return 'from-indigo-600 via-blue-700 to-teal-500';
+    if (!weather) return 'from-[#1e3a8a] via-[#3b82f6] to-[#2dd4bf]';
     const condition = weather.weather[0].main.toLowerCase();
-    if (condition.includes('cloud')) return 'from-slate-500 via-gray-600 to-slate-700';
-    if (condition.includes('rain')) return 'from-blue-800 via-indigo-900 to-slate-900';
-    if (condition.includes('clear')) return 'from-orange-400 via-red-500 to-pink-500';
-    return 'from-indigo-600 via-blue-700 to-teal-500';
+    if (condition.includes('cloud')) return 'from-[#334155] via-[#475569] to-[#94a3b8]';
+    if (condition.includes('rain')) return 'from-[#0f172a] via-[#1e293b] to-[#334155]';
+    if (condition.includes('clear')) return 'from-[#f59e0b] via-[#ef4444] to-[#db2777]';
+    return 'from-[#1e3a8a] via-[#3b82f6] to-[#2dd4bf]';
   };
 
   const fetchWeather = async (city) => {
     setLoading(true);
-    setError(null);
     try {
       const data = await getWeatherData(city);
       const forecastData = await getForecastData(city);
@@ -43,38 +41,10 @@ function App() {
       addToRecent(data.name);
       setView('dashboard');
     } catch (err) {
-      setError("City not found.");
-      setTimeout(() => setError(null), 3000);
+      alert("City not found!");
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchWeatherByCoords = async (lat, lon) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
-      const fRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
-      const data = await res.json();
-      const fData = await fRes.json();
-      setWeather(data);
-      setForecast(fData.list.filter(r => r.dt_txt.includes("12:00:00")));
-      setView('dashboard');
-    } catch (err) {
-      setError("Location error.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGeolocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
-      () => setError("Permission denied.")
-    );
   };
 
   const addToRecent = (city) => {
@@ -83,142 +53,160 @@ function App() {
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      fetchWeather(searchQuery);
-      setSearchQuery('');
-    }
+  // Screen Transition Variants
+  const slideVariants = {
+    initial: { x: '100%', opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: '-100%', opacity: 0 }
   };
 
-  // 1. LANDING VIEW
-  if (view === 'landing' && !loading) {
-    return (
-      <div className={`min-h-screen bg-gradient-to-br ${getBgColor()} flex flex-col items-center justify-between p-10 text-white font-sans transition-all duration-1000`}>
-        <div className="mt-20 text-center animate-in fade-in zoom-in duration-700">
-          <div className="text-9xl mb-6 drop-shadow-2xl">🌤️</div>
-          <h1 className="text-5xl font-black tracking-tighter drop-shadow-lg italic">WeatherDash</h1>
-          <p className="text-white/80 mt-2 text-lg font-medium">Clear Skies, Clean Code.</p>
-        </div>
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${getBgColor()} font-sans overflow-hidden text-white transition-colors duration-1000`}>
+      <AnimatePresence mode="wait">
         
-        <div className="w-full space-y-4 mb-10">
-          <button 
-            onClick={() => setView('search')}
-            className="w-full bg-white/90 border border-white/30 backdrop-blur-md p-6 rounded-[2rem] text-xl font-medium text-left flex justify-between items-center shadow-2xl transition-all active:scale-95"
+        {/* 1. LANDING VIEW */}
+        {view === 'landing' && (
+          <motion.div 
+            key="landing"
+            variants={slideVariants}
+            initial="initial" animate="animate" exit="exit"
+            className="h-screen flex flex-col items-center justify-between p-10"
           >
-            <span className="text-slate-600">Search city...</span> 
-            <span className="text-slate-400">🔍</span>
-          </button>
-          
-          <button 
-            onClick={handleGeolocation}
-            className="w-full bg-white text-indigo-600 p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
+            <div className="mt-20 text-center">
+              <motion.div 
+                animate={{ y: [0, -20, 0] }} 
+                transition={{ repeat: Infinity, duration: 4 }}
+                className="text-9xl mb-6 drop-shadow-2xl"
+              >
+                🌤️
+              </motion.div>
+              <h1 className="text-6xl font-black tracking-tighter italic">SkyCast</h1>
+              <p className="text-white/70 font-medium">Adventure awaits outside.</p>
+            </div>
+
+            <div className="w-full space-y-4 mb-10">
+              <button 
+                onClick={() => setView('search')}
+                className="w-full bg-white/10 backdrop-blur-md border border-white/30 p-6 rounded-[2.5rem] text-xl font-bold flex justify-between items-center shadow-2xl"
+              >
+                Explore a city... <span className="text-white/50">🔍</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* 2. SEARCH VIEW */}
+        {view === 'search' && (
+          <motion.div 
+            key="search"
+            variants={slideVariants}
+            initial="initial" animate="animate" exit="exit"
+            className="h-screen p-6 bg-black/20 backdrop-blur-3xl"
           >
-            📍 USE MY LOCATION
-          </button>
-        </div>
-      </div>
-    );
-  }
+            <div className="flex items-center gap-4 mb-10">
+              <button onClick={() => setView('landing')} className="text-4xl">←</button>
+              <h2 className="text-2xl font-black italic">Search</h2>
+            </div>
 
-  // 2. SEARCH VIEW
-  if (view === 'search') {
-    return (
-      <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 font-sans animate-in slide-in-from-bottom-10 duration-500`}>
-        <div className="flex items-center gap-4 mb-10 text-white">
-            <button onClick={() => setView('landing')} className="text-3xl p-2 font-bold hover:bg-white/10 rounded-full transition-colors">←</button>
-            <h2 className="text-2xl font-black tracking-tight italic text-white">Find City</h2>
-        </div>
+            <form onSubmit={(e) => { e.preventDefault(); fetchWeather(searchQuery); }} className="relative mb-10">
+              <input 
+                autoFocus
+                className="w-full p-6 pl-16 rounded-[2rem] bg-white/95 text-slate-900 text-xl font-bold outline-none shadow-2xl"
+                placeholder="Where to?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <span className="absolute left-6 top-6 text-2xl text-slate-400">🔍</span>
+            </form>
 
-        <form onSubmit={handleSearchSubmit} className="relative mb-10">
-          <input 
-            autoFocus
-            type="text" 
-            placeholder="Search e.g. London..." 
-            className="w-full p-6 pl-16 rounded-[2rem] bg-white/95 border border-white/30 outline-none focus:ring-4 focus:ring-white/50 text-slate-900 placeholder-slate-500 text-xl font-semibold backdrop-blur-xl shadow-2xl"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <span className="absolute left-6 top-6 text-2xl text-slate-400">🔍</span>
-        </form>
-
-        <h3 className="text-white/80 uppercase tracking-widest text-xs font-black mb-6 ml-2">History</h3>
-        <div className="space-y-4">
-          {recentSearches.length > 0 ? (
-            recentSearches.map((city) => (
+            <div className="space-y-4">
+              <p className="text-xs font-black uppercase tracking-widest text-white/50 ml-2">Recent Travels</p>
+              {recentSearches.map(city => (
                 <button 
                   key={city}
                   onClick={() => fetchWeather(city)}
-                  className="w-full bg-white/95 backdrop-blur-md p-6 rounded-3xl text-left flex justify-between items-center border border-white/10 hover:bg-white transition-all group shadow-lg"
+                  className="w-full bg-white/10 p-6 rounded-[2rem] flex justify-between items-center border border-white/10 hover:bg-white/20 transition-all"
                 >
-                  <span className="font-bold text-lg text-slate-900 group-hover:translate-x-2 transition-transform italic uppercase">{city}</span>
-                  <span className="text-slate-500 group-hover:text-indigo-600 font-bold">→</span>
+                  <span className="text-xl font-bold italic uppercase">{city}</span>
+                  <span className="text-white/50">→</span>
                 </button>
-              ))
-          ) : (
-            <div className="text-center p-16 text-white/60 italic border-2 border-dashed border-white/20 rounded-[3rem]">No recent searches</div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // 3. DASHBOARD VIEW
-  return (
-    <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 text-white font-sans transition-all duration-1000`}>
-      {loading ? (
-        <div className="h-screen flex flex-col items-center justify-center gap-6">
-          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <p className="text-white font-black tracking-widest uppercase animate-pulse">Syncing...</p>
-        </div>
-      ) : (
-        <div className="animate-in fade-in slide-in-from-top-10 duration-700">
-          <div className="flex justify-between items-center mb-8 mt-4">
-            <button onClick={() => setView('search')} className="bg-white/20 p-4 rounded-3xl border border-white/20 backdrop-blur-md shadow-xl active:scale-75 transition-all text-xl">🔍</button>
-            <div className="text-center">
-                <h2 className="text-2xl font-black tracking-tight drop-shadow-lg italic">{weather?.name}</h2>
-                <div className="h-1 w-full bg-white/50 rounded-full"></div>
+              ))}
             </div>
-            <button onClick={handleGeolocation} className="bg-white/20 p-4 rounded-3xl border border-white/20 backdrop-blur-md shadow-xl active:scale-75 transition-all text-xl">📍</button>
-          </div>
+          </motion.div>
+        )}
 
-          <div className="flex flex-col items-center text-center mb-10">
-            <h1 className="text-[10rem] leading-none font-black tracking-tighter mb-4 drop-shadow-2xl">
-                {Math.round(weather?.main.temp)}°
-            </h1>
-            <p className="bg-white/20 backdrop-blur-md px-6 py-2 rounded-full uppercase tracking-[0.3em] font-black text-xs border border-white/20 mb-4">
-              {weather?.weather[0].description}
-            </p>
-            <img 
-              src={`https://openweathermap.org/img/wn/${weather?.weather[0].icon}@4x.png`} 
-              alt="weather"
-              className="w-56 h-56 -mt-8 drop-shadow-2xl"
-            />
-          </div>
+        {/* 3. DASHBOARD VIEW */}
+        {view === 'dashboard' && weather && (
+          <motion.div 
+            key="dashboard"
+            variants={slideVariants}
+            initial="initial" animate="animate" exit="exit"
+            className="min-h-screen p-6 overflow-y-auto no-scrollbar"
+          >
+            <div className="flex justify-between items-center mt-4 mb-8">
+              <button onClick={() => setView('search')} className="bg-white/20 p-4 rounded-3xl border border-white/20">🔍</button>
+              <h2 className="text-2xl font-black italic">{weather.name}</h2>
+              <button onClick={() => setView('landing')} className="bg-white/20 p-4 rounded-3xl border border-white/20">🏠</button>
+            </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-10">
-            <WeatherDetailCard title="Humidity" value={`${weather?.main.humidity}%`} icon="💧" />
-            <WeatherDetailCard title="Wind" value={`${weather?.wind.speed} m/s`} icon="💨" />
-            <WeatherDetailCard title="Feels Like" value={`${Math.round(weather?.main.feels_like)}°`} icon="🌡️" />
-            <WeatherDetailCard title="Pressure" value={`${weather?.main.pressure} hPa`} icon="⏲️" />
-          </div>
-
-          <div className="flex justify-between items-center mb-6 px-2">
-            <h3 className="font-black text-xl tracking-tight italic uppercase">Weekly Forecast</h3>
-            <span className="text-[10px] bg-black/20 px-3 py-1 rounded-full font-bold uppercase">Swipe →</span>
-          </div>
-          
-          <div className="flex overflow-x-auto gap-4 pb-12 no-scrollbar scroll-smooth">
-            {forecast.map((day, index) => (
-              <div key={index} className="min-w-[120px] bg-white/10 backdrop-blur-xl p-6 rounded-[2.5rem] flex flex-col items-center border border-white/20 shadow-xl">
-                <p className="text-[10px] text-white/60 font-black uppercase mb-3">
-                  {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'long' })}
-                </p>
-                <img src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`} alt="icon" className="w-12 h-12 mb-2 drop-shadow-md" />
-                <p className="font-black text-2xl text-white">{Math.round(day.main.temp)}°</p>
+            {/* SLEEK UPGRADE: The Main Hero Section */}
+            <div className="flex flex-col items-center mb-10 relative">
+              <motion.h1 
+                initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                className="text-[11rem] leading-none font-black tracking-tighter drop-shadow-2xl"
+              >
+                {Math.round(weather.main.temp)}°
+              </motion.h1>
+              <div className="bg-black/20 backdrop-blur-md px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-[0.4em] border border-white/10">
+                {weather.weather[0].description}
               </div>
-            ))}
-          </div>
+            </div>
+
+            {/* ADVENTUROUS ADDITION: AI Insight Card */}
+            <div className="bg-white/10 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/20 mb-8 shadow-2xl">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-xl">✨</span>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Quick Insight</p>
+              </div>
+              <p className="text-lg font-bold leading-tight italic">
+                {weather.main.temp > 25 ? "It's heatwave season. Stay hydrated!" : "A bit chilly. Perfect for a cozy jacket."}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-10">
+              <WeatherDetailCard title="Humidity" value={`${weather.main.humidity}%`} icon="💧" />
+              <WeatherDetailCard title="Wind Speed" value={`${weather.wind.speed} m/s`} icon="💨" />
+              <WeatherDetailCard title="Feels Like" value={`${Math.round(weather.main.feels_like)}°`} icon="🌡️" />
+              <WeatherDetailCard title="Pressure" value={`${weather.main.pressure} hPa`} icon="⏲️" />
+            </div>
+
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-black italic">Next 5 Days</h3>
+              <div className="h-px flex-1 bg-white/20 mx-4"></div>
+            </div>
+
+            <div className="flex overflow-x-auto gap-4 pb-10 no-scrollbar">
+              {forecast.map((day, i) => (
+                <div key={i} className="min-w-[130px] bg-white/10 p-6 rounded-[2.5rem] flex flex-col items-center border border-white/10 shadow-xl">
+                  <p className="text-[10px] font-black uppercase text-white/50 mb-2">
+                    {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
+                  </p>
+                  <img src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`} alt="icon" className="w-12 h-12" />
+                  <p className="text-2xl font-black">{Math.round(day.main.temp)}°</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+          <motion.div 
+            animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            className="w-16 h-16 border-4 border-white border-t-transparent rounded-full"
+          />
         </div>
       )}
     </div>
