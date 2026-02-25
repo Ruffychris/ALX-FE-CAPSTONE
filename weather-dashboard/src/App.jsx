@@ -114,7 +114,7 @@ function App() {
     );
   }
 
-  // 2. SEARCH VIEW
+  // 2. SEARCH VIEW - Updated with Teal Text for History
   if (view === 'search') {
     return (
       <div className="min-h-screen bg-[#020617] p-6 text-white font-sans animate-in slide-in-from-bottom-10 duration-500">
@@ -142,10 +142,13 @@ function App() {
                 <button 
                   key={city}
                   onClick={() => fetchWeather(city)}
-                  className="w-full bg-slate-900/50 p-6 rounded-3xl text-left flex justify-between items-center border border-slate-800 hover:border-teal-500/50 transition-all group"
+                  className="w-full bg-slate-900/50 p-6 rounded-3xl text-left flex justify-between items-center border border-slate-800 hover:border-teal-500 transition-all group"
                 >
-                  <span className="font-bold text-lg group-hover:text-teal-400">{city}</span>
-                  <span className="text-teal-500">→</span>
+                  {/* CHANGED: Text is now Teal to pop against the dark history bar */}
+                  <span className="font-bold text-lg text-teal-400 group-hover:text-white transition-colors uppercase tracking-tight italic">
+                    {city}
+                  </span>
+                  <span className="text-white/30 group-hover:text-teal-400">VIEW →</span>
                 </button>
               ))
           ) : (
