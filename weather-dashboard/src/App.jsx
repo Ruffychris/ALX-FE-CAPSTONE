@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getWeatherData, getForecastData } from './services/weatherService';
 
-// Reusable Detail Card with "Crystal" Glass effect
+// Reusable Detail Card with readable contrast
 const WeatherDetailCard = ({ title, value, icon }) => (
-  <div className="bg-white/10 backdrop-blur-2xl p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center border border-white/20 transition-transform active:scale-95">
+  <div className="bg-white/20 backdrop-blur-2xl p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center border border-white/30 transition-transform active:scale-95">
     <p className="text-white/70 text-[10px] uppercase tracking-widest mb-1 font-bold">{title}</p>
     <div className="text-xl mb-1 drop-shadow-md">{icon}</div>
     <p className="font-bold text-base text-white drop-shadow-sm">{value}</p>
@@ -23,7 +23,6 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Dynamic Background Logic based on weather condition
   const getBgColor = () => {
     if (!weather) return 'from-indigo-600 via-blue-700 to-teal-500';
     const condition = weather.weather[0].main.toLowerCase();
@@ -92,23 +91,24 @@ function App() {
     }
   };
 
-  // 1. LANDING VIEW - Vibrant Glass
+  // 1. LANDING VIEW
   if (view === 'landing' && !loading) {
     return (
       <div className={`min-h-screen bg-gradient-to-br ${getBgColor()} flex flex-col items-center justify-between p-10 text-white font-sans transition-all duration-1000`}>
         <div className="mt-20 text-center animate-in fade-in zoom-in duration-700">
           <div className="text-9xl mb-6 drop-shadow-2xl">🌤️</div>
-          <h1 className="text-5xl font-black tracking-tighter drop-shadow-lg">WeatherDash</h1>
-          <p className="text-white/80 mt-2 text-lg font-medium drop-shadow-md">Simple. Precise. Glass.</p>
+          <h1 className="text-5xl font-black tracking-tighter drop-shadow-lg italic">WeatherDash</h1>
+          <p className="text-white/80 mt-2 text-lg font-medium">Clear Skies, Clean Code.</p>
         </div>
         
         <div className="w-full space-y-4 mb-10">
           <button 
             onClick={() => setView('search')}
-            className="w-full bg-white/20 border border-white/30 backdrop-blur-md p-6 rounded-[2rem] text-xl font-medium text-left flex justify-between items-center shadow-2xl transition-all active:scale-95"
+            className="w-full bg-white/90 border border-white/30 backdrop-blur-md p-6 rounded-[2rem] text-xl font-medium text-left flex justify-between items-center shadow-2xl transition-all active:scale-95"
           >
-            <span className="text-white/90">Search city...</span> 
-            <span className="opacity-70">🔍</span>
+            {/* Darker text for landing search trigger */}
+            <span className="text-slate-600">Search city...</span> 
+            <span className="text-slate-400">🔍</span>
           </button>
           
           <button 
@@ -122,63 +122,65 @@ function App() {
     );
   }
 
-  // 2. SEARCH VIEW - Minimalist Glass
+  // 2. SEARCH VIEW - Fixed Contrast
   if (view === 'search') {
     return (
-      <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 text-white font-sans animate-in slide-in-from-bottom-10 duration-500`}>
-        <div className="flex items-center gap-4 mb-10">
+      <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 font-sans animate-in slide-in-from-bottom-10 duration-500`}>
+        <div className="flex items-center gap-4 mb-10 text-white">
             <button onClick={() => setView('landing')} className="text-3xl p-2 font-bold hover:bg-white/10 rounded-full transition-colors">←</button>
-            <h2 className="text-2xl font-black tracking-tight">Search</h2>
+            <h2 className="text-2xl font-black tracking-tight italic">Find City</h2>
         </div>
 
         <form onSubmit={handleSearchSubmit} className="relative mb-10">
           <input 
             autoFocus
             type="text" 
-            placeholder="Search e.g. Lagos..." 
-            className="w-full p-6 pl-16 rounded-[2rem] bg-white/20 border border-white/30 outline-none focus:ring-4 focus:ring-white/30 text-white placeholder-white/60 text-xl font-semibold backdrop-blur-xl"
+            placeholder="Search e.g. London..." 
+            {/* Changed bg to 90% white and text to Slate-800 for visibility */}
+            className="w-full p-6 pl-16 rounded-[2rem] bg-white/90 border border-white/30 outline-none focus:ring-4 focus:ring-white/50 text-slate-800 placeholder-slate-400 text-xl font-semibold backdrop-blur-xl shadow-2xl"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <span className="absolute left-6 top-6 text-2xl opacity-70">🔍</span>
+          <span className="absolute left-6 top-6 text-2xl text-slate-400">🔍</span>
         </form>
 
-        <h3 className="text-white/60 uppercase tracking-widest text-xs font-black mb-6 ml-2">Recent Searches</h3>
+        <h3 className="text-white/80 uppercase tracking-widest text-xs font-black mb-6 ml-2">History</h3>
         <div className="space-y-4">
           {recentSearches.length > 0 ? (
             recentSearches.map((city) => (
                 <button 
                   key={city}
                   onClick={() => fetchWeather(city)}
-                  className="w-full bg-white/10 backdrop-blur-md p-6 rounded-3xl text-left flex justify-between items-center border border-white/10 hover:bg-white/20 transition-all group"
+                  {/* High contrast history buttons */}
+                  className="w-full bg-white/90 backdrop-blur-md p-6 rounded-3xl text-left flex justify-between items-center border border-white/10 hover:bg-white transition-all group shadow-lg"
                 >
-                  <span className="font-bold text-lg group-hover:translate-x-2 transition-transform">{city}</span>
-                  <span className="opacity-50 group-hover:opacity-100">→</span>
+                  <span className="font-bold text-lg text-slate-800 group-hover:translate-x-2 transition-transform italic uppercase">{city}</span>
+                  <span className="text-slate-400 group-hover:text-indigo-600 font-bold">→</span>
                 </button>
               ))
           ) : (
-            <div className="text-center p-16 text-white/40 italic border-2 border-dashed border-white/10 rounded-[3rem]">No history yet</div>
+            <div className="text-center p-16 text-white/60 italic border-2 border-dashed border-white/20 rounded-[3rem]">No recent searches</div>
           )}
         </div>
       </div>
     );
   }
 
-  // 3. DASHBOARD VIEW - Full Dynamic Glass
+  // 3. DASHBOARD VIEW
   return (
     <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 text-white font-sans transition-all duration-1000`}>
       {loading ? (
         <div className="h-screen flex flex-col items-center justify-center gap-6">
           <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <p className="text-white font-black tracking-widest uppercase animate-pulse">Updating...</p>
+          <p className="text-white font-black tracking-widest uppercase animate-pulse">Syncing...</p>
         </div>
       ) : (
         <div className="animate-in fade-in slide-in-from-top-10 duration-700">
           <div className="flex justify-between items-center mb-8 mt-4">
             <button onClick={() => setView('search')} className="bg-white/20 p-4 rounded-3xl border border-white/20 backdrop-blur-md shadow-xl active:scale-75 transition-all text-xl">🔍</button>
             <div className="text-center">
-                <h2 className="text-2xl font-black tracking-tight drop-shadow-lg">{weather?.name}</h2>
-                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Live Data</p>
+                <h2 className="text-2xl font-black tracking-tight drop-shadow-lg italic">{weather?.name}</h2>
+                <div className="h-1 w-full bg-white/50 rounded-full"></div>
             </div>
             <button onClick={handleGeolocation} className="bg-white/20 p-4 rounded-3xl border border-white/20 backdrop-blur-md shadow-xl active:scale-75 transition-all text-xl">📍</button>
           </div>
@@ -193,7 +195,7 @@ function App() {
             <img 
               src={`https://openweathermap.org/img/wn/${weather?.weather[0].icon}@4x.png`} 
               alt="weather"
-              className="w-56 h-56 -mt-8 drop-shadow-2xl animate-pulse"
+              className="w-56 h-56 -mt-8 drop-shadow-2xl"
             />
           </div>
 
@@ -205,7 +207,7 @@ function App() {
           </div>
 
           <div className="flex justify-between items-center mb-6 px-2">
-            <h3 className="font-black text-xl tracking-tight">Weekly Forecast</h3>
+            <h3 className="font-black text-xl tracking-tight italic uppercase">Weekly Forecast</h3>
             <span className="text-[10px] bg-black/20 px-3 py-1 rounded-full font-bold uppercase">Swipe →</span>
           </div>
           
