@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getWeatherData, getForecastData } from './services/weatherService';
 
-// Reusable Detail Card with darker translucent background for better contrast
+// Reusable Detail Card for Mobile Grid
 const WeatherDetailCard = ({ title, value, icon }) => (
   <div className="bg-slate-900/40 backdrop-blur-xl p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center border border-white/10 transition-transform active:scale-95">
     <p className="text-slate-400 text-[10px] uppercase tracking-widest mb-1 font-bold">{title}</p>
@@ -82,10 +82,10 @@ function App() {
     }
   };
 
-  // 1. LANDING VIEW - High Contrast
+  // 1. LANDING VIEW
   if (view === 'landing' && !loading) {
     return (
-      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-between p-10 text-white font-sans selection:bg-teal-500">
+      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-between p-10 text-white font-sans">
         <div className="mt-20 text-center animate-in fade-in zoom-in duration-1000">
           <div className="text-9xl mb-6 drop-shadow-[0_0_35px_rgba(20,184,166,0.3)]">🌤️</div>
           <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent italic">
@@ -114,7 +114,7 @@ function App() {
     );
   }
 
-  // 2. SEARCH VIEW - Dark Backdrop
+  // 2. SEARCH VIEW
   if (view === 'search') {
     return (
       <div className="min-h-screen bg-[#020617] p-6 text-white font-sans animate-in slide-in-from-bottom-10 duration-500">
@@ -156,7 +156,7 @@ function App() {
     );
   }
 
-  // 3. DASHBOARD VIEW - Dynamic Dark Blue
+  // 3. DASHBOARD VIEW
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#020617] p-6 text-white font-sans">
       {loading ? (
@@ -185,7 +185,7 @@ function App() {
             <img 
               src={`https://openweathermap.org/img/wn/${weather?.weather[0].icon}@4x.png`} 
               alt="weather"
-              className="w-56 h-56 -mt-8 animate-bounce-slow"
+              className="w-56 h-56 -mt-8"
             />
           </div>
 
@@ -205,4 +205,17 @@ function App() {
             {forecast.map((day, index) => (
               <div key={index} className="min-w-[120px] bg-slate-900/80 backdrop-blur-md p-6 rounded-[3rem] flex flex-col items-center border border-slate-800 shadow-2xl">
                 <p className="text-[10px] text-slate-500 font-black uppercase mb-3">
-                  {new Date(day.dt *
+                  {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'long' })}
+                </p>
+                <img src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`} alt="icon" className="w-12 h-12 mb-2" />
+                <p className="font-black text-2xl text-white">{Math.round(day.main.temp)}°</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
