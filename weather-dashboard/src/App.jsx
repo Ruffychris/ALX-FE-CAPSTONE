@@ -33,7 +33,7 @@ function App() {
       setWeather(data);
       setForecast(forecastData);
       addToRecent(data.name);
-      setView('dashboard'); // Switch to dashboard view on success
+      setView('dashboard');
     } catch (err) {
       setError("City not found.");
     } finally {
@@ -85,7 +85,7 @@ function App() {
   // 1. LANDING VIEW
   if (view === 'landing' && !loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e3a8a] to-[#0d9488] flex flex-col items-center justify-between p-10 text-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e3a8a] to-[#0d9488] flex flex-col items-center justify-between p-10 text-white font-sans">
         <div className="mt-20 text-center animate-in fade-in zoom-in duration-700">
           <div className="text-8xl mb-6 drop-shadow-2xl">🌤️</div>
           <h1 className="text-5xl font-bold tracking-tight">WeatherDash</h1>
@@ -115,7 +115,7 @@ function App() {
   // 2. SEARCH VIEW
   if (view === 'search') {
     return (
-      <div className="min-h-screen bg-[#0f172a] p-6 text-white animate-in slide-in-from-bottom duration-300">
+      <div className="min-h-screen bg-[#0f172a] p-6 text-white animate-in slide-in-from-bottom duration-300 font-sans">
         <div className="flex items-center gap-4 mb-8">
             <button onClick={() => setView('landing')} className="text-3xl text-teal-400 p-2">←</button>
             <h2 className="text-xl font-bold">Search</h2>
@@ -156,10 +156,10 @@ function App() {
 
   // 3. DASHBOARD VIEW
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] p-6 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] p-6 text-white font-sans">
       {loading ? (
         <div className="h-screen flex flex-col items-center justify-center gap-4">
-          <div className="w-12 h-12 border-4 border-teal-400 border-t-transparent rounded-full animate-spin shadow-lg shadow-teal-500/20"></div>
+          <div className="w-12 h-12 border-4 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
           <p className="animate-pulse text-teal-400 font-medium">Fetching Data...</p>
         </div>
       ) : (
@@ -174,7 +174,7 @@ function App() {
           </div>
 
           <div className="flex flex-col items-center text-center mb-10">
-            <h1 className="text-[10rem] leading-none font-extralight tracking-tighter mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">
+            <h1 className="text-[8rem] leading-none font-extralight tracking-tighter mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">
                 {Math.round(weather?.main.temp)}°
             </h1>
             <p className="text-teal-400 uppercase tracking-[0.3em] font-bold text-sm mb-2">{weather?.weather[0].description}</p>
@@ -194,4 +194,24 @@ function App() {
 
           <div className="flex justify-between items-center mb-4 px-2">
             <h3 className="font-bold text-lg">Next 5 Days</h3>
-            <span className="text-[10px] text-white/
+            <span className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Swipe →</span>
+          </div>
+          
+          <div className="flex overflow-x-auto gap-4 pb-8 no-scrollbar scroll-smooth">
+            {forecast.map((day, index) => (
+              <div key={index} className="min-w-[110px] bg-white/5 backdrop-blur-md p-5 rounded-[2.5rem] flex flex-col items-center border border-white/10 shadow-xl">
+                <p className="text-xs text-white/40 font-bold uppercase mb-2">
+                  {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
+                </p>
+                <img src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`} alt="icon" className="w-12 h-12" />
+                <p className="font-bold text-xl">{Math.round(day.main.temp)}°</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
