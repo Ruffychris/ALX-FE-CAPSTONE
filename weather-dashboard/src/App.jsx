@@ -106,7 +106,6 @@ function App() {
             onClick={() => setView('search')}
             className="w-full bg-white/90 border border-white/30 backdrop-blur-md p-6 rounded-[2rem] text-xl font-medium text-left flex justify-between items-center shadow-2xl transition-all active:scale-95"
           >
-            {/* Darker text for landing search trigger */}
             <span className="text-slate-600">Search city...</span> 
             <span className="text-slate-400">🔍</span>
           </button>
@@ -122,13 +121,13 @@ function App() {
     );
   }
 
-  // 2. SEARCH VIEW - Fixed Contrast
+  // 2. SEARCH VIEW
   if (view === 'search') {
     return (
       <div className={`min-h-screen bg-gradient-to-b ${getBgColor()} p-6 font-sans animate-in slide-in-from-bottom-10 duration-500`}>
         <div className="flex items-center gap-4 mb-10 text-white">
             <button onClick={() => setView('landing')} className="text-3xl p-2 font-bold hover:bg-white/10 rounded-full transition-colors">←</button>
-            <h2 className="text-2xl font-black tracking-tight italic">Find City</h2>
+            <h2 className="text-2xl font-black tracking-tight italic text-white">Find City</h2>
         </div>
 
         <form onSubmit={handleSearchSubmit} className="relative mb-10">
@@ -136,8 +135,7 @@ function App() {
             autoFocus
             type="text" 
             placeholder="Search e.g. London..." 
-            {/* Changed bg to 90% white and text to Slate-800 for visibility */}
-            className="w-full p-6 pl-16 rounded-[2rem] bg-white/90 border border-white/30 outline-none focus:ring-4 focus:ring-white/50 text-slate-800 placeholder-slate-400 text-xl font-semibold backdrop-blur-xl shadow-2xl"
+            className="w-full p-6 pl-16 rounded-[2rem] bg-white/95 border border-white/30 outline-none focus:ring-4 focus:ring-white/50 text-slate-900 placeholder-slate-500 text-xl font-semibold backdrop-blur-xl shadow-2xl"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -151,11 +149,10 @@ function App() {
                 <button 
                   key={city}
                   onClick={() => fetchWeather(city)}
-                  {/* High contrast history buttons */}
-                  className="w-full bg-white/90 backdrop-blur-md p-6 rounded-3xl text-left flex justify-between items-center border border-white/10 hover:bg-white transition-all group shadow-lg"
+                  className="w-full bg-white/95 backdrop-blur-md p-6 rounded-3xl text-left flex justify-between items-center border border-white/10 hover:bg-white transition-all group shadow-lg"
                 >
-                  <span className="font-bold text-lg text-slate-800 group-hover:translate-x-2 transition-transform italic uppercase">{city}</span>
-                  <span className="text-slate-400 group-hover:text-indigo-600 font-bold">→</span>
+                  <span className="font-bold text-lg text-slate-900 group-hover:translate-x-2 transition-transform italic uppercase">{city}</span>
+                  <span className="text-slate-500 group-hover:text-indigo-600 font-bold">→</span>
                 </button>
               ))
           ) : (
