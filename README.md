@@ -5,21 +5,21 @@ The Weather Dashboard is a responsive web application built with React that allo
 
 This project simulates a real-world application workflow, including API integration, responsive design, version control, and deployment.
 
-🚀 Features
-Search for any city and view current weather conditions
-Displays temperature, humidity, wind speed, and weather icons
-Responsive layout for desktop, tablet, and mobile devices
-Error handling for invalid city searches and network issues
-Real-time weather updates
-Clean and modern UI using Tailwind CSS
+🚀 Features include:
+Search for any city and view current weather conditions,
+Displays temperature, humidity, wind speed, and weather icons,
+Responsive layout for desktop, tablet, and mobile devices,
+Error handling for invalid city searches and network issues,
+Real-time weather updates, 
+Clean and modern UI using Tailwind CSS.
 
-🛠️ Technologies Used
-React JS
-Vite
-Tailwind CSS
-OpenWeatherMap API
-Git & GitHub
-Vercel
+🛠️ Technologies used are:
+React JS,
+Vite,
+Tailwind CSS,
+OpenWeatherMap API,
+Git & GitHub, and
+Vercel.
 
 📁 Project Structure
 src/
@@ -31,16 +31,15 @@ src/
 
 
 🌍 Deployment
-
 This application will be deployed using Vercel.
 The live link will be added here after deployment.
 
-📌 Future Improvements
-7-day weather forecast
-Geolocation support
-Dark/Light mode
-Recent searches and saved locations
-Multi-language support
+📌 Future improvements to be considered are;
+7-day weather forecast,
+Geolocation support,
+Dark/Light mode,
+Recent searches and saved locations, and
+Multi-language support.
 
-👨‍💻 Author
+👨‍💻 Author:
 Developed by Rufus Abeiku Christian
